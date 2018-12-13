@@ -109,9 +109,12 @@ export default function createAggregateLayout(graph, progress) {
   function runOverlapsRemoval() {
     // TODO: Async?
     let rectangles = getRectangles();
-    removeOverlaps(rectangles);
-    removeOverlaps(rectangles);
-    removeOverlaps(rectangles);
+    let move = 0, delta = 0; 
+    do {
+      let newMove = removeOverlaps(rectangles);
+      delta = Math.abs(newMove - move);
+      move = newMove;
+    } while (delta > 1);
     rectangles.forEach((rect, nodeId) => {
       physicsLayout.setNodePosition(nodeId, rect.left - rect.dx, rect.top - rect.dy);
     });
@@ -153,8 +156,9 @@ export default function createAggregateLayout(graph, progress) {
         let links = graph.getLinks(nodeId);
         let mul = links ? links.length : 1;
         let node = graph.getNode(nodeId);
-        mul *=  (MAX_DEPTH - node.data.depth) + 1;
-        return nodeId.length * mul;
+        mul *=  node.data.size * 3;
+        let mass = nodeId.length * mul;
+        return mass || 1;
       }
     });
   }

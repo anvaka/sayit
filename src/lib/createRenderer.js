@@ -10,7 +10,6 @@ export default function createRenderer(progress) {
   const scene = document.querySelector('#scene');
   const nodeContainer = scene.querySelector('#nodes');
   const edgeContainer = scene.querySelector('#edges');
-  const hideTooltipArgs = {isVisible: false};
 
   const panzoom = createPanZoom(scene);
   const defaultRectangle = {left: -500, right: 500, top: -500, bottom: 500}
@@ -33,22 +32,38 @@ export default function createRenderer(progress) {
     bus.off('graph-ready', onGraphReady);
   }
 
-  function onMouseMove(e) {
-    const id = e.target && e.target.id;
-    const link = linkAnimator.getLinkInfo(id);
-    if (link) {
-      showTooltip(link, e.clientX, e.clientY);
-    } else {
-      hideTooltip();
-    }
-  }
-
   function onMouseClick(e) {
     const clickTarget = e.target;
     if (!nodeContainer.contains(clickTarget)) return;
 
     let nodeId = getNodeIdFromUI(clickTarget);
     bus.fire('show-subreddit', nodeId);
+
+    removeClass('hovered');
+    removeClass('emphasized');
+
+    const mainNode = nodes.get(nodeId);
+    mainNode.classList.add('hovered');
+    mainNode.classList.add('emphasized');
+    graph.forEachLinkedNode(nodeId, function(otherNode, link) {
+      const ui = nodes.get(otherNode.id);
+      ui.classList.add('hovered');
+      moveToFront(ui);
+
+      const linkInfo = linkAnimator.getLinkInfo(link.id);
+      if (linkInfo) {
+        const linkUI = linkInfo.ui;
+        linkUI.classList.add('hovered');
+        moveToFront(linkUI);
+      }
+    });
+    moveToFront(mainNode);
+  }
+
+  function moveToFront(el) {
+    const {parentNode} = el;
+    parentNode.removeChild(el);
+    parentNode.appendChild(el);
   }
 
   function getNodeIdFromUI(el) {
@@ -58,34 +73,13 @@ export default function createRenderer(progress) {
     }
   }
 
-  function showTooltip(minLink, clientX, clientY) {
-    const {fromId, toId} = minLink.link;
-    bus.fire('show-tooltip', {
-      isVisible: true,
-      from: fromId, 
-      to: toId, 
-      x: clientX,
-      y: clientY
-    });
-
-    removeHighlight();
-
-    nodes.get(fromId).classList.add('hovered');
-    nodes.get(toId).classList.add('hovered');
-    minLink.ui.classList.add('hovered');
-  }
-
-  function hideTooltip() {
-    bus.fire('show-tooltip', hideTooltipArgs);
-    removeHighlight();
-  }
-
-  function removeHighlight() {
-    scene.querySelectorAll('.hovered').forEach(removeHoverClass);
-  }
-
-  function removeHoverClass(el) {
-    el.classList.remove('hovered');
+  function removeClass(className) {
+    const elements = scene.querySelectorAll(`.${className}`);
+    if (elements) {
+      for (let i = 0; i < elements.length; ++i) {
+        elements[i].classList.remove(className);
+      }
+    }
   }
 
   function render(newGraph) {
@@ -130,7 +124,6 @@ export default function createRenderer(progress) {
   function drawLinks() {
     progress.done();
     linkAnimator = createLinkAnimator(graph, layout, edgeContainer);
-    document.addEventListener('mousemove', onMouseMove);
     document.addEventListener('click', onMouseClick);
   }
 
@@ -138,7 +131,6 @@ export default function createRenderer(progress) {
     clear(nodeContainer);
     clear(edgeContainer);
 
-    document.removeEventListener('mousemove', onMouseMove);
     document.removeEventListener('click', onMouseClick);
 
     if (layout) layout.off('ready', drawLinks);
@@ -171,7 +163,7 @@ export default function createRenderer(progress) {
       ry: uiAttributes.ry,
       fill: 'white',
       'stroke-width': uiAttributes.strokeWidth, 
-      stroke: '#58585A'
+      stroke: '#aaa' // '#58585A'
     }
     const textAttributes = {
       'font-size': uiAttributes.fontSize,
@@ -197,7 +189,7 @@ export default function createRenderer(progress) {
 
 
   function getNodeUIAttributes(nodeId, dRatio) {
-    const fontSize = 24 * dRatio + 6;
+    const fontSize = 24 * dRatio + 12;
     const size = textMeasure(nodeId, fontSize);
     const width = size.totalWidth + size.spaceWidth * 6;
     const height = fontSize * 1.6;

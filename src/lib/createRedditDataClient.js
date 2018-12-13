@@ -37,17 +37,11 @@ export default function createDataClient(endpoint) {
     let firstLetter = query[0].toLocaleLowerCase();
     let results = downloaded.get(firstLetter);
     if (results) {
-      // console.time('search');
-      // results = fuzzysort.go(query, list, {limit: 10})
-      // console.timeEnd('search');
-      // console.time('search-prepared');
       results = fuzzysort.go(query, prepared, {limit: 10})
-      // console.timeEnd('search-prepared');
-      // let r = fuse.search(query)
-      // r = r.slice(0, 10).map(idx => fuse.list[idx]);
-      console.log(results);
-
-      return Promise.resolve(results.map(x => x.target));
+      return Promise.resolve(results.map(x => ({
+        html: fuzzysort.highlight(x, '<b>', '</b>'),
+        text: x.target
+      })));
     } else {
       return downloadAndIndexFile(firstLetter).then(() => {
         return getSuggestion(query);
@@ -70,6 +64,8 @@ export default function createDataClient(endpoint) {
         downloaded.set(firstLetter, response);
         response.forEach(row => {
           let keyName = row[0].toLocaleLowerCase();
+          if (indexed.get(keyName)) return;
+
           list.push(row[0]);
           indexed.set(keyName, row);
         });
@@ -79,8 +75,8 @@ export default function createDataClient(endpoint) {
 
   function getFileForQuery(query) {
     let firstLetter = query[0].toLocaleLowerCase();
-    let results = indexed.get(firstLetter);
-    if (results) return Promise.resolve(results);
+    let results = downloaded.get(firstLetter);
+    if (results) return Promise.resolve([]);
 
     return downloadAndIndexFile(firstLetter).then(() => {
         let sims = indexed.get(query.toLocaleLowerCase())

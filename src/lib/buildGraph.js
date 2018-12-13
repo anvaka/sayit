@@ -2,8 +2,6 @@ import bus from '../bus';
 import redditDataClient from './redditDataClient';
 
 export default function buildGraph(entryWord, MAX_DEPTH, progress) {
-  //let redditDataClient = createRedditDataClient('https://anvaka.github.io/sayit-data/1/')
-
   entryWord = entryWord && entryWord.trim();
   if (!entryWord) return;
 
@@ -90,13 +88,8 @@ export default function buildGraph(entryWord, MAX_DEPTH, progress) {
     });
   }
 
-  function onPendingReady(res) {
+  function onPendingReady(res, query) {
+    if (!res || !res.length) res = [query];
     loadSiblings(res);
-    // if (res.length >= 2) {
-    //   loadSiblings(query, res[1]);
-    // } else {
-    //   console.error(res);
-    //   throw new Error('Unexpected response');
-    // }
   }
 }

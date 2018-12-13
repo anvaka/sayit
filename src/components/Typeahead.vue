@@ -6,10 +6,11 @@
         :readonly='readonly'
         autocomplete='off' autocorrect='off' autocapitalize='off' spellcheck='false'
         :placeholder='placeholder' @input='getSuggestionsInternal' @keydown='cycleTheList'/>
+  <a type='submit' class='search-submit' href='#' @click.prevent='pickCurrentText' v-if='currentQuery'>Go</a>
   <ul v-if='showSuggestions' class='suggestions'>
     <li v-for='(suggestion, index) in suggestions' :key='index'>
-      <a @click.prevent='pickSuggestion(suggestion)' class='suggestion' :class="{selected: suggestion.selected}" href='#'>
-      {{suggestion.text}}
+      <a @click.prevent='pickSuggestion(suggestion)' class='suggestion' :class="{selected: suggestion.selected}" href='#'
+         v-html='suggestion.html'>
       </a>
     </li>
   </ul>
@@ -24,28 +25,52 @@
 @import '../vars.styl'
 
 .ak-typeahead
-  height: 100%
+  height: 100%;
+  flex: 1;
   align-items: stretch;
 
   input::-ms-clear {
       display: none;
   }
 
-.suggestion
-  display: block
-  width: 100%
-  height: 42px
-  border-bottom: 1px solid border-color
-  display: flex
-  align-items: center
-  padding-left: 10px
-  text-decoration: none
-  color: primary-text
+.search-submit {
+  color: #B2B2B2;
+  position: absolute;
+  right: 0;
+  top: 0;
+  height: 100%;
+  align-items: center;
+  text-decoration: none;
+  display: flex;
+  flex-shrink: 0;
+  width: 48px;
+  justify-content: center;
+  outline: none;
+  &:hover, &:focus {
+    color: background-color;
+    background: highlight-color;
+  }
+}
+.suggestion {
+  display: block;
+  width: 100%;
+  height: 28px;
+  display: flex;
+  
+  align-items: center;
+  padding-left: 10px;
+  text-decoration: none;
+  font-weight: bold;
+  color: primary-text;
+
+  b {
+    font-weight: normal;
+  }
+}
 
 .suggestion:hover,
 .suggestion.selected
-  background-color: $c-50
-  color: $accent-text
+  background-color: #eee;
 
 .suggestions
   position: absolute
@@ -151,7 +176,11 @@ export default {
         var p = self.getSuggestions(query)
 
         if (Array.isArray(p)) {
-          self.suggestions = p.map(x => ({ selected: false, text: x }))
+          self.suggestions = p.map(x => ({ 
+            selected: false, 
+            text: x.text,
+            html: x.html
+          }))
           self.currentSelected = -1
           self.showIfNeeded(p && p.length > 0)
         } else if (p) {
@@ -159,7 +188,11 @@ export default {
           p.then(function (suggestions) {
             self.showLoading = false;
             suggestions = suggestions || []
-            self.suggestions = suggestions.map(x => ({ selected: false, text: x }))
+            self.suggestions = suggestions.map(x => ({
+              selected: false,
+              text: x.text,
+              html: x.html
+            }))
             self.currentSelected = -1
             self.showIfNeeded(suggestions && suggestions.length > 0)
           });

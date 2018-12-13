@@ -8,7 +8,6 @@
                 :query='appState.query'
                 :get-suggestions='getSuggestions'>
       </typeahead>
-      <a type='submit' class='search-submit' href='#' @click.prevent='onSubmit' v-if='appState.query'>Go</a>
     </form>
     <div class='help' v-if='!isLoading'>
       The graph of related subreddits
@@ -154,25 +153,6 @@ path.hovered {
     background: background-color;
   }
 }
-a {
-  &:hover, &:focus {
-    color: highlight-color;
-    border-bottom: 1px dashed;  
-  }
-}
-.search-submit {
-  align-items: center;
-  text-decoration: none;
-  display: flex;
-  flex-shrink: 0;
-  width: 48px;
-  justify-content: center;
-  outline: none;
-  &:hover, &:focus {
-    color: background-color;
-    background: highlight-color;
-  }
-}
 .special {
   color: highlight-color;
   font-family: monospace;
@@ -227,13 +207,9 @@ a {
   height: 48px;
   display: flex;
   font-size: 16px;
-  padding: 0 0 0 8px;
+  padding: 0;
   cursor: text;
 
-  a {
-    color: #B2B2B2
-    cursor: pointer;
-  }
   span {
     display: flex;
     align-items: center;
@@ -269,6 +245,34 @@ g.node {
   right: 0;
   top: 0;
   width: 400px;
+  overflow: hidden;
+
+  a {
+    target: '_blank'
+  }
+  .controls {
+    position: absolute;
+    top: 42px;
+    right: 0;
+    left: 1px;
+    height: 32px;
+  }
+}
+
+.title-area {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 42px;
+}
+.details-container {
+  position: absolute;
+  top: 82px;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  overflow-y: auto;
 }
 
 @media (max-height: 550px) {

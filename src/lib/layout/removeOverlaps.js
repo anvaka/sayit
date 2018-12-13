@@ -1,6 +1,7 @@
 import findMinimumSpanningTree from 'ngraph.kruskal';
 import getDelaunayGraph from './getDelaunayGraph';
 import makeSpanningTree from './makeSpanningTree';
+var randomAPI = require('ngraph.random');
 
 class EdgeModel {
   constructor (from, to) {
@@ -41,6 +42,7 @@ export default function removeOverlaps(rectangles, options) {
     vertices.push(pair)
   })
 
+  let totalMovement = 0;
   const triangulationGraph = getDelaunayGraph(vertices)
   triangulationGraph.forEachLink(addTriangulationLinkWeight);
 
@@ -48,7 +50,10 @@ export default function removeOverlaps(rectangles, options) {
   const mstEdges = mst.map(edge => new EdgeModel(
     getRect(edge.fromId),
     getRect(edge.toId)
-  ))
+  ));
+
+  var randomIterator = randomAPI.randomIterator(mstEdges);
+  randomIterator.shuffle();
 
   let spanningTree
   if (mstEdges.length > 0) {
@@ -57,7 +62,7 @@ export default function removeOverlaps(rectangles, options) {
     grow(spanningTree)
   }
 
-  return
+  return totalMovement;
 
   function getRect (id) {
     return rectangles.get(id)
@@ -105,6 +110,7 @@ export default function removeOverlaps(rectangles, options) {
         rootPos.cx = childPos.cx - t * dx
         rootPos.cy = childPos.cy - t * dy
       }
+      totalMovement += Math.sqrt(t * t * (dx * dx + dy * dy));
     }
   }
 
