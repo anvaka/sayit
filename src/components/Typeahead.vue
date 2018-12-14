@@ -16,7 +16,13 @@
   </ul>
 
   <ul v-if='showLoading' class='suggestions'>
-    <li>Searching...</li>
+    <li class='searching'>
+      <span v-if='!loadingError'>Searching...</span>
+      <div v-if='loadingError' class='loading-error'>
+        <div>Failed to get reddit completions:</div>
+        <pre>{{loadingError}}</pre>
+      </div>
+    </li>
   </ul>
 </div>
 </template>
@@ -72,7 +78,7 @@
 .suggestion.selected
   background-color: #eee;
 
-.suggestions
+.suggestions {
   position: absolute
   top: 48px
   width: 100%
@@ -82,6 +88,18 @@
   margin: 0
   border-top: 1px solid $border-color
   box-shadow: 0 2px 4px rgba(0,0,0,0.2)
+
+  .searching {
+    margin: 8px;
+  }
+  .loading-error {
+    pre {
+      color: orangered;
+      overflow-x: auto;
+      padding-bottom: 14px;
+    }
+  }
+}
 
 input
   height: 100%
@@ -124,6 +142,7 @@ export default {
       currentSelected: -1,
       showSuggestions: false,
       showLoading: false,
+      loadingError: null,
       suggestions: [],
       currentQuery: this.query
     }
@@ -184,6 +203,7 @@ export default {
           self.currentSelected = -1
           self.showIfNeeded(p && p.length > 0)
         } else if (p) {
+          self.loadingError = null;
           self.showLoading = true;
           p.then(function (suggestions) {
             self.showLoading = false;
@@ -195,6 +215,8 @@ export default {
             }))
             self.currentSelected = -1
             self.showIfNeeded(suggestions && suggestions.length > 0)
+          }, function(err) {
+            self.loadingError = err;
           });
         } else {
           throw new Error('Could not parse suggestions response')
