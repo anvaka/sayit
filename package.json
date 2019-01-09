@@ -23,7 +23,7 @@
     "simplesvg": "^0.1.1",
     "splaytree": "^2.0.3",
     "vue": "^2.5.2",
-    "vuereddit": "^0.1.0"
+    "vuereddit": "^0.1.2"
   },
   "devDependencies": {
     "autoprefixer": "^7.1.2",

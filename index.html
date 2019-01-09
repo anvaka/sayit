@@ -1,44 +1,50 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <meta name="referrer" content="no-referrer">
-    <meta property="og:title" content="Autocomplete VS graph" />
-    <meta property="og:description" content="Visualization of related subreddits" />
-    <meta name="author" content="Andrei Kashcha">
-   <title>Related subreddits based on your comments</title>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width,initial-scale=1.0,user-scalable=no"
+    />
+    <meta name="referrer" content="no-referrer" />
+    <meta property="og:title" content="Graph of related subreddits" />
+    <meta property="og:image" content="https://i.imgur.com/ysfYACZ.png" />
+    <meta
+      property="og:description"
+      content="Visualization of related subreddits"
+    />
+    <meta name="author" content="Andrei Kashcha" />
+    <title>Related subreddits based on your comments</title>
     <style>
-  * {
-    box-sizing: border-box;
-  }
-  body {
-    font-family: 'Avenir', Helvetica, Arial, sans-serif;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    color: #2c3e50;
-    position: fixed;
-    width: 100%;
-    height: 100%;
-    left: 0;
-    top: 0;
-    margin: 0;
-  }
-  svg {
-    width: 100%;
-    height: 100%;
-    position: absolute;
-    left: 0;
-    top: 0;
-  }
-  #scene {
-    pointer-events: all;
-  }
-  svg text {
-    font-family: 'Roboto',arial,sans-serif;
-  }
-  </style>
-
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        font-family: "Avenir", Helvetica, Arial, sans-serif;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        color: #2c3e50;
+        position: fixed;
+        width: 100%;
+        height: 100%;
+        left: 0;
+        top: 0;
+        margin: 0;
+      }
+      svg {
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        left: 0;
+        top: 0;
+      }
+      #scene {
+        pointer-events: all;
+      }
+      svg text {
+        font-family: "Roboto", arial, sans-serif;
+      }
+    </style>
   </head>
   <body>
     <svg>
@@ -49,13 +55,28 @@
     </svg>
     <div id="app"></div>
     <!-- built files will be auto injected -->
-<script>
-  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-  ga('create', 'UA-47259320-1', 'anvaka.github.io');
-  ga('send', 'pageview');
-</script>
+    <script>
+      (function(i, s, o, g, r, a, m) {
+        i["GoogleAnalyticsObject"] = r;
+        (i[r] =
+          i[r] ||
+          function() {
+            (i[r].q = i[r].q || []).push(arguments);
+          }),
+          (i[r].l = 1 * new Date());
+        (a = s.createElement(o)), (m = s.getElementsByTagName(o)[0]);
+        a.async = 1;
+        a.src = g;
+        m.parentNode.insertBefore(a, m);
+      })(
+        window,
+        document,
+        "script",
+        "//www.google-analytics.com/analytics.js",
+        "ga"
+      );
+      ga("create", "UA-47259320-1", "anvaka.github.io");
+      ga("send", "pageview");
+    </script>
   </body>
 </html>
