@@ -1,10 +1,20 @@
-# sayit-ui
+# visualization of related subreddits
 
-> When a comment is more than a comment
+This project builds a graph of related subreddits.
 
-## Build Setup
+[![demo](https://i.imgur.com/xKlxRkf.gif)](https://anvaka.github.io/sayit/)
 
-``` bash
+Recommendations are constructed based on "Redditors who commented in this subreddit, also commented to..."
+
+## The data
+
+I used data from two months worth of comments (August and September of 2018) - which contains ~38 millions `user <-> subreddit` records.
+
+You can find original data by [following this discussion](https://www.reddit.com/r/datasets/comments/3bxlg7/i_have_every_publicly_available_reddit_comment/)
+
+## Local Build Setup
+
+```bash
 # install dependencies
 npm install
 
