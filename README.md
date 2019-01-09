@@ -4,7 +4,9 @@ This project builds a graph of related subreddits.
 
 [![demo](https://i.imgur.com/xKlxRkf.gif)](https://anvaka.github.io/sayit/)
 
-Recommendations are constructed based on "Redditors who commented in this subreddit, also commented to..."
+Recommendations are constructed based on _Redditors who commented in this subreddit, also commented to..._
+
+Play with it here: https://anvaka.github.io/sayit/
 
 ## The data
 
