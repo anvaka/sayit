@@ -21,7 +21,7 @@
     <div class="help" v-if="isLoading">{{appState.progress.message}}</div>
     <div class="about-line">
       <a class="about-link" href="#" @click.prevent="aboutVisible = true">about</a>
-      <a class="bold" href="http://github.com/anvaka/say-it">source code</a>
+      <a class="bold" href="https://github.com/anvaka/sayit">source code</a>
     </div>
 
     <about v-if="aboutVisible" @close="aboutVisible = false"></about>
