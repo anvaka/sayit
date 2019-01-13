@@ -14,7 +14,7 @@ I used data from two months worth of comments (August and September of 2018) - w
 
 You can find original data by [following this discussion](https://www.reddit.com/r/datasets/comments/3bxlg7/i_have_every_publicly_available_reddit_comment/)
 
-I computed Jaccard Similarity between subreddits, and then stored results into github pages. Please let me know if you are curious to learn more about this or anything else - feel free to reach out to me on [twitter](https://twitter.com/anvaka) or via issues in this repository
+I computed Jaccard Similarity between subreddits, and then stored results into github pages. Repository [is available here](https://github.com/anvaka/sayit-data). Please let me know if you are curious to learn more about this or anything else - feel free to reach out to me on [twitter](https://twitter.com/anvaka) or via issues in this repository
 
 ## Local Build Setup
 
