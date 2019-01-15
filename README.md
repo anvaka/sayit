@@ -16,6 +16,12 @@ You can find original data by [following this discussion](https://www.reddit.com
 
 I computed Jaccard Similarity between subreddits, and then stored results into github pages. Please let me know if you are curious to learn more about this or anything else - feel free to reach out to me on [twitter](https://twitter.com/anvaka) or via issues in this repository
 
+Note: for very popular subreddits Jaccard Similarity didn't give meaningful results. They all were connected
+to each other (e.g. `/r/aww`, `/r/pics`, `/r/funny` and so on). I manually collected references to other subreddits
+from subreddit description where it was available. Where description did not include any recommendation -
+I looked into actual comments and used most often mentioned subreddits as "related". You can find list of all
+overrides in the [sayit-data](https://github.com/anvaka/sayit-data#override) repository
+
 ## Local Build Setup
 
 ```bash
