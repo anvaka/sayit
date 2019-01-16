@@ -1,15 +1,15 @@
-import createPanZoom from "panzoom";
-import createTextMeasure from "./measureText";
-import createAggregateLayout from "./aggregateLayout";
-import bus from "../bus";
-import createLinkAnimator from "./renderer/linkAnimator";
+import createPanZoom from 'panzoom';
+import createTextMeasure from './measureText';
+import createAggregateLayout from './aggregateLayout';
+import bus from '../bus';
+import createLinkAnimator from './renderer/linkAnimator';
 
-let svg = require("simplesvg");
+let svg = require('simplesvg');
 
 export default function createRenderer(progress) {
-  const scene = document.querySelector("#scene");
-  const nodeContainer = scene.querySelector("#nodes");
-  const edgeContainer = scene.querySelector("#edges");
+  const scene = document.querySelector('#scene');
+  const nodeContainer = scene.querySelector('#nodes');
+  const edgeContainer = scene.querySelector('#edges');
   let lastPanTime = 0;
   let lastTouchEndTime = 0;
   let clickTimeout;
@@ -26,7 +26,7 @@ export default function createRenderer(progress) {
     currentLayoutFrame = 0,
     linkAnimator;
   let textMeasure = createTextMeasure(scene);
-  bus.on("graph-ready", onGraphReady);
+  bus.on('graph-ready', onGraphReady);
 
   return {
     render,
@@ -35,7 +35,7 @@ export default function createRenderer(progress) {
 
   function dispose() {
     clearLastScene();
-    bus.off("graph-ready", onGraphReady);
+    bus.off('graph-ready', onGraphReady);
   }
 
   function onMouseClick(e) {
@@ -43,27 +43,45 @@ export default function createRenderer(progress) {
     if (!nodeContainer.contains(clickTarget)) return;
 
     let nodeId = getNodeIdFromUI(clickTarget);
-    bus.fire("show-subreddit", nodeId);
+    bus.fire('show-subreddit', nodeId);
 
-    removeClass("hovered");
-    removeClass("emphasized");
+    highlightNode(nodeId);
+  }
+
+  function highlightNode(nodeId) {
+    removeClass('hovered');
 
     const mainNode = nodes.get(nodeId);
-    mainNode.classList.add("hovered");
-    mainNode.classList.add("emphasized");
+    makeHovered(mainNode);
     graph.forEachLinkedNode(nodeId, function(otherNode, link) {
       const ui = nodes.get(otherNode.id);
-      ui.classList.add("hovered");
+      ui.classList.add('hovered');
       moveToFront(ui);
 
       const linkInfo = linkAnimator.getLinkInfo(link.id);
       if (linkInfo) {
         const linkUI = linkInfo.ui;
-        linkUI.classList.add("hovered");
+        makeHovered(linkUI);
         moveToFront(linkUI);
       }
     });
     moveToFront(mainNode);
+  }
+
+  function onBeforeLinkAdded(linkInfo) {
+    let { link, ui } = linkInfo;
+    if (link.fromId === graph.rootId || link.toId === graph.rootId) {
+      makeHovered(ui);
+      let toUI = nodeContainer.querySelector('#' + link.toId);
+      makeHovered(toUI);
+
+      let fromUI = nodeContainer.querySelector('#' + link.fromId);
+      makeHovered(fromUI);
+    }
+  }
+
+  function makeHovered(ui) {
+    ui.classList.add('hovered');
   }
 
   function onDoubleClickMouse(e) {
@@ -80,7 +98,7 @@ export default function createRenderer(progress) {
 
     let nodeId = getNodeIdFromUI(clickTarget);
     if (nodeId) {
-      bus.fire("new-search", nodeId);
+      bus.fire('new-search', nodeId);
       panzoom.showRectangle(defaultRectangle);
     }
   }
@@ -93,7 +111,7 @@ export default function createRenderer(progress) {
 
   function getNodeIdFromUI(el) {
     while (el) {
-      if (el.classList.contains("node")) return el.id;
+      if (el.classList.contains('node')) return el.id;
       el = el.parentNode;
     }
   }
@@ -113,12 +131,12 @@ export default function createRenderer(progress) {
 
     layout = createAggregateLayout(graph, progress);
 
-    layout.on("ready", drawLinks);
+    layout.on('ready', drawLinks);
 
     nodes = new Map();
 
     graph.forEachNode(addNode);
-    graph.on("changed", onGraphStructureChanged);
+    graph.on('changed', onGraphStructureChanged);
 
     cancelAnimationFrame(currentLayoutFrame);
     currentLayoutFrame = requestAnimationFrame(frame);
@@ -140,7 +158,7 @@ export default function createRenderer(progress) {
 
   function onGraphStructureChanged(changes) {
     changes.forEach(change => {
-      if (change.changeType === "add" && change.node) {
+      if (change.changeType === 'add' && change.node) {
         addNode(change.node);
       }
     });
@@ -149,24 +167,25 @@ export default function createRenderer(progress) {
   function drawLinks() {
     progress.done();
     linkAnimator = createLinkAnimator(graph, layout, edgeContainer);
-    document.addEventListener("click", onMouseClick);
-    document.addEventListener("dblclick", onDoubleClickMouse, true);
-    document.addEventListener("touchend", onTouchEnd);
+    document.addEventListener('click', onMouseClick);
+    document.addEventListener('dblclick', onDoubleClickMouse, true);
+    document.addEventListener('touchend', onTouchEnd);
+    linkAnimator.on('beforeAddLink', onBeforeLinkAdded);
 
-    panzoom.on("pan", onPan);
+    panzoom.on('pan', onPan);
   }
 
   function clearLastScene() {
     clear(nodeContainer);
     clear(edgeContainer);
 
-    document.removeEventListener("click", onMouseClick);
-    document.removeEventListener("dblclick", onDoubleClickMouse, true);
-    document.removeEventListener("touchend", onTouchEnd);
+    document.removeEventListener('click', onMouseClick);
+    document.removeEventListener('dblclick', onDoubleClickMouse, true);
+    document.removeEventListener('touchend', onTouchEnd);
 
-    panzoom.off("pan", onPan);
-    if (layout) layout.off("ready", drawLinks);
-    if (graph) graph.off("changed", onGraphStructureChanged);
+    panzoom.off('pan', onPan);
+    if (layout) layout.off('ready', drawLinks);
+    if (graph) graph.off('changed', onGraphStructureChanged);
     if (linkAnimator) linkAnimator.dispose();
   }
 
@@ -215,25 +234,26 @@ export default function createRenderer(progress) {
       height: uiAttributes.height,
       rx: uiAttributes.rx,
       ry: uiAttributes.ry,
-      fill: "white",
-      "stroke-width": uiAttributes.strokeWidth,
-      stroke: "#aaa" // '#58585A'
+      fill: 'white',
+      'stroke-width': uiAttributes.strokeWidth,
+      stroke: '#aaa' // '#58585A'
     };
     const textAttributes = {
-      "font-size": uiAttributes.fontSize,
+      'font-size': uiAttributes.fontSize,
       x: uiAttributes.px,
       y: uiAttributes.py
     };
 
-    const rect = svg("rect", rectAttributes);
-    const text = svg("text", textAttributes);
+    const rect = svg('rect', rectAttributes);
+    const text = svg('text', textAttributes);
     text.text(node.id);
 
-    const ui = svg("g", {
-      class: "node",
+    const ui = svg('g', {
+      class: 'node',
       id: node.id,
       transform: `translate(${pos.x}, ${pos.y})`
     });
+
     ui.appendChild(rect);
     ui.appendChild(text);
 
@@ -264,7 +284,7 @@ export default function createRenderer(progress) {
   function updatePositions() {
     nodes.forEach((ui, nodeId) => {
       let pos = getNodePosition(nodeId);
-      ui.attr("transform", `translate(${pos.x}, ${pos.y})`);
+      ui.attr('transform', `translate(${pos.x}, ${pos.y})`);
     });
   }
 

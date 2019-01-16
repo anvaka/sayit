@@ -3,11 +3,14 @@ import Progress from './Progress';
 
 const queryState = require('query-state');
 
-const qs = queryState({
-  query: ''
-}, {
-  useSearch: true
-});
+const qs = queryState(
+  {
+    query: ''
+  },
+  {
+    useSearch: true
+  }
+);
 
 let lastBuilder;
 const appStateFromQuery = qs.get();
@@ -16,8 +19,8 @@ const appState = {
   maxDepth: appStateFromQuery.maxDepth || 2,
   progress: new Progress(),
   graph: null,
-  query: appStateFromQuery.query,
-}
+  query: appStateFromQuery.query
+};
 
 if (appState.query) {
   performSearch(appState.query);
@@ -41,6 +44,7 @@ export function performSearch(queryString) {
   }
 
   lastBuilder = buildGraph(queryString, appState.maxDepth, appState.progress);
+  lastBuilder.graph.rootId = queryString;
   appState.graph = Object.freeze(lastBuilder.graph);
   return lastBuilder.graph;
 }

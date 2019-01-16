@@ -1,22 +1,43 @@
+/**
+ * A simple utility which animates links into appearance.
+ */
 let svg = require('simplesvg');
 let random = require('ngraph.random')(42);
+let eventify = require('ngraph.events');
 
 export default function createLinkAnimator(graph, layout, edgeContainer) {
+  /**
+   * Maps link id into {ui, link} - where `ui` is ui element that renders
+   * `link` from a graph.
+   */
   const links = new Map();
-  let beingAnimated = new Map();
   const scheduled = [];
+
+  let beingAnimated = new Map();
   let maxAnimations = 20;
   let maxDepth = graph.maxDepth;
+
   graph.forEachLink(scheduleLink);
+
   scheduled.sort((a, b) => {
-    return getLinkScore(a) - getLinkScore(b)
-  })
+    return getLinkScore(a) - getLinkScore(b);
+  });
+
   let processor = requestAnimationFrame(processNext);
 
-  return {
+  const linkAnimator = eventify({
+    /**
+     * Gets {ui, link} for a given link id.
+     */
     getLinkInfo,
+
+    /**
+     * Stops all animations.
+     */
     dispose
-  }
+  });
+
+  return linkAnimator;
 
   function dispose() {
     if (processor) {
@@ -27,8 +48,8 @@ export default function createLinkAnimator(graph, layout, edgeContainer) {
 
   function processNext() {
     while (beingAnimated.size < maxAnimations && scheduled.length > 0) {
-      let link = scheduled.pop()
-      let speed = Math.round(Math.abs(random.gaussian() * 30)) + 1
+      let link = scheduled.pop();
+      let speed = Math.round(Math.abs(random.gaussian() * 30)) + 1;
       beingAnimated.set(link.id, animateLink(link, speed));
     }
 
@@ -36,6 +57,7 @@ export default function createLinkAnimator(graph, layout, edgeContainer) {
       el.step();
       if (el.isDone) beingAnimated.delete(key);
     });
+
     if (scheduled.length > 0 || beingAnimated.size > 0) {
       processor = requestAnimationFrame(processNext);
     }
@@ -48,8 +70,8 @@ export default function createLinkAnimator(graph, layout, edgeContainer) {
   function getLinkScore(link) {
     let fromNode = graph.getNode(link.fromId).data;
     let toNode = graph.getNode(link.toId).data;
-    const depth = (fromNode.depth + toNode.depth)/2;
-    return (maxDepth - depth)/maxDepth;
+    const depth = (fromNode.depth + toNode.depth) / 2;
+    return (maxDepth - depth) / maxDepth;
   }
 
   function scheduleLink(link) {
@@ -61,18 +83,19 @@ export default function createLinkAnimator(graph, layout, edgeContainer) {
     let from = layout.getNodePosition(link.fromId);
     let to = layout.getNodePosition(link.toId);
 
-    const dRatio = getLinkScore(link)
+    const dRatio = getLinkScore(link);
     const strokeWidth = 8 * dRatio + 2;
     const color = Math.round((200 - 75) * (1 - dRatio) + 75);
 
     let api = {
       step,
       isDone: false
-    }
+    };
+
     return api;
 
     function step() {
-      let t = ease(frame/maxT);
+      let t = ease(frame / maxT);
       let x = from.x * (1 - t) + to.x * t;
       let y = from.y * (1 - t) + to.y * t;
       let linkInfo = links.get(link.id);
@@ -83,11 +106,14 @@ export default function createLinkAnimator(graph, layout, edgeContainer) {
           'stroke-width': strokeWidth,
           fill: 'black',
           stroke: `rgb(${color}, ${color}, ${color})`,
-          d: pathData 
+          d: pathData
         });
-        edgeContainer.appendChild(ui);
 
-        links.set(link.id, {ui, link});
+        const linkInfo = { ui, link };
+        links.set(link.id, linkInfo);
+        linkAnimator.fire('beforeAddLink', linkInfo);
+
+        edgeContainer.appendChild(ui);
       } else {
         linkInfo.ui.attr('d', pathData);
       }
@@ -100,5 +126,5 @@ export default function createLinkAnimator(graph, layout, edgeContainer) {
 }
 
 function ease(t) {
-  return t*(2-t);
+  return t * (2 - t);
 }
