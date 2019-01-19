@@ -4,7 +4,7 @@ select author, subreddit, comment_count from (
         subreddit,
         COUNT(subreddit) AS comment_count,
         COUNT(*) OVER (PARTITION BY author) AS rows_count
-    FROM `fh-bigquery.reddit_comments.2018_08`
+    FROM `fh-bigquery.reddit_comments.2018_10`
     WHERE
         (NOT REGEXP_CONTAINS(author, r'(?i)(deleted)|(bot)|(AutoModerator)')) AND
         (NOT REGEXP_CONTAINS(subreddit, r'(?i)^u_'))
