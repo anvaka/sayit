@@ -18,14 +18,12 @@
 //var fileName = 'github_watch.reddit_comments_2018_08.csv'
 var fileName = 'out.csv'
 
-// maps pair of subreddits into `Counter` object. I use object and not a Map
-// because Map in my node crashes with out of memory sooner ¯\_(ツ)_/¯
-var keyToCount = {};
+var parents = new Map(); // Map<subreddit, Map<otherSubreddit, Counter>>
 
 // Gives number of unique commenters for each subreddit.
 var commentersCount = new Map();
 
-// Once all file is processed we store here list 
+// Once all file is processed we store here list
 var indexedSimilarity = new Map();
 
 // this is passed by ./index_by_letter.js
@@ -79,7 +77,7 @@ forEachLine(fileName, (line) => {
   lastUserSubs.push({sub, count});
 }).then(() => {
   console.log('all indexed');
-  Object.keys(keyToCount).forEach(indexSimilarity);
+  parents.forEach(visitParentToIndex);
 }).then(() => {
   writeOutputFor.forEach(subreddit => {
     var sims = getSimilarTo(subreddit);
@@ -129,14 +127,12 @@ function getSimilarTo(subName) {
   }
 }
 
-function indexSimilarity(subredditPairKey) {
-  var pair = subredditPairKey.split('|');
-  var subA = pair[0];
-  var subB = pair[1];
+function visitParentToIndex(other, subA) {
+  other.forEach((counter, subB) => indexSimilarity(subA, subB, counter));
+}
 
+function indexSimilarity(subA, subB, counter) {
   if (!subA || !subB) throw new Error('Subreddits key is malformed ' + subredditPairKey);
-
-  var counter = keyToCount[subredditPairKey];
 
   // Regular Jaccard similarity:
   var similarity = counter.count/(commentersCount.get(subA) + commentersCount.get(subB) - counter.count);
@@ -198,11 +194,18 @@ function recordLastUser(subs) {
         continue;
       }
 
-      var key = makeKey(subA.sub, subB.sub);
-      let scores = keyToCount[key];
+      var pair = makeKey(subA.sub, subB.sub);
+      let parentItem = parents.get(pair.parent);
+      if (!parentItem) {
+        parentItem = new Map();
+        parents.set(pair.parent, parentItem);
+      }
+
+      let scores = parentItem.get(pair.child);
+
       if (!scores) {
         scores = new Counter();
-        keyToCount[key] = scores;
+        parentItem.set(pair.child, scores);
       }
 
       var na = subA.count/total;
@@ -214,7 +217,13 @@ function recordLastUser(subs) {
 }
 
 function makeKey(subA, subB) {
-  return subA < subB ? subA + '|' + subB : subB + '|' + subA;
+  return subA < subB ? {
+    parent: subA,
+    child: subB
+  } : {
+    parent: subB,
+    child: subA
+  };
 }
 
 function createOutStream(outFileName) {
