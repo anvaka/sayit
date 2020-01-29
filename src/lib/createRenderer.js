@@ -72,10 +72,10 @@ export default function createRenderer(progress) {
     let { link, ui } = linkInfo;
     if (link.fromId === graph.rootId || link.toId === graph.rootId) {
       makeHovered(ui);
-      let toUI = nodeContainer.querySelector('#' + link.toId);
+      let toUI = nodeContainer.querySelector('#node-' + link.toId);
       makeHovered(toUI);
 
-      let fromUI = nodeContainer.querySelector('#' + link.fromId);
+      let fromUI = nodeContainer.querySelector('#node-' + link.fromId);
       makeHovered(fromUI);
     }
   }
@@ -111,7 +111,7 @@ export default function createRenderer(progress) {
 
   function getNodeIdFromUI(el) {
     while (el) {
-      if (el.classList.contains('node')) return el.id;
+      if (el.classList.contains('node')) return el.id.slice('node-'.length);
       el = el.parentNode;
     }
   }
@@ -250,7 +250,7 @@ export default function createRenderer(progress) {
 
     const ui = svg('g', {
       class: 'node',
-      id: node.id,
+      id: 'node-' + node.id,
       transform: `translate(${pos.x}, ${pos.y})`
     });
 
