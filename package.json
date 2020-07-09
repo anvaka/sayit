@@ -18,7 +18,7 @@
     "ngraph.graph": "0.0.14",
     "ngraph.kruskal": "^1.0.0",
     "ngraph.random": "^0.1.0",
-    "panzoom": "^7.0.3",
+    "panzoom": "^9.2.4",
     "query-state": "^4.2.0",
     "simplesvg": "^0.1.1",
     "splaytree": "^2.0.3",
