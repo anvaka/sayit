@@ -182,6 +182,10 @@ a {
   text-decoration: none;
 }
 
+.age-warning {
+  margin-top: 62px
+}
+
 .about-line {
   position: fixed;
   right: 0;
