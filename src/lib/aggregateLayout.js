@@ -15,7 +15,6 @@ const USE_REAL = 4;
  * Orchestrates layout of algorithm between phases.
  */
 export default function createAggregateLayout(graph, progress) {
-  const MAX_DEPTH = graph.maxDepth;
   let physicsLayout = createPhysicsLayout(graph);
   let fakeLayout = createFakeLayout(graph);
   let interpolateLayout = createInterpolateLayout(fakeLayout, physicsLayout);

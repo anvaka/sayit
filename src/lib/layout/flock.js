@@ -116,10 +116,10 @@ export class Boid {
   // Wraparound
   borders() {
     return;
-    if (this.position.x < -this.r) this.velocity.x *= -1;
-    if (this.position.y < -this.r) this.velocity.y *= -1;
-    if (this.position.x > this.r) this.velocity.x *= -1;
-    if (this.position.y > this.r) this.velocity.y *= -1;
+    // if (this.position.x < -this.r) this.velocity.x *= -1;
+    // if (this.position.y < -this.r) this.velocity.y *= -1;
+    // if (this.position.x > this.r) this.velocity.x *= -1;
+    // if (this.position.y > this.r) this.velocity.y *= -1;
   }
 
   // Separation
