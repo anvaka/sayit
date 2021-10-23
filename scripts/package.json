@@ -1,7 +1,8 @@
 {
   "dependencies": {
-    "JSONStream": "^1.3.5",
+    "event-stream": "^4.0.1",
     "for-each-line": "^1.0.0",
+    "JSONStream": "^1.3.5",
     "n-readlines": "^1.0.0"
   }
 }
