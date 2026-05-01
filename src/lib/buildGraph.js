@@ -1,5 +1,6 @@
 import bus from '../bus';
 import redditDataClient from './redditDataClient';
+import subredditCountries from './subredditCountries';
 
 export default function buildGraph(entryWord, MAX_DEPTH, progress) {
   entryWord = entryWord && entryWord.trim();
@@ -92,4 +93,24 @@ export default function buildGraph(entryWord, MAX_DEPTH, progress) {
     if (!res || !res.length) res = [query];
     loadSiblings(res);
   }
+}
+
+export default function buildGraph(records) {
+  records.forEach(record => {
+    let from = record.from;
+    let to = record.to;
+    graph.addNode(from, {
+      id: from,
+      name: from,
+      country: subredditCountries[from.toLowerCase()] || 'Unknown'
+    });
+    graph.addNode(to, {
+      id: to,
+      name: to,
+      country: subredditCountries[to.toLowerCase()] || 'Unknown'
+    });
+    graph.addLink(from, to);
+  });
+
+  return graph;
 }

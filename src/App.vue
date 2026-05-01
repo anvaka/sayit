@@ -2,13 +2,7 @@
   <div id="app">
     <form v-on:submit.prevent="onSubmit" class="search-box">
       <!-- <input class='search-input' type="text" v-model='appState.query' placeholder='Enter query' autofocus> -->
-      <typeahead
-        placeholder="Enter subreddit name"
-        ref:typeahead
-        @selected="doSearch"
-        :query="appState.query"
-        :get-suggestions="getSuggestions"
-      ></typeahead>
+      <typeahead :graph="graph" @selected="onSelected" @country-changed="onCountryChanged"/>
     </form>
     <div class="help" v-if="!isLoading">
       The graph of related subreddits
@@ -69,7 +63,8 @@ export default {
         text: "",
         x: "",
         y: ""
-      }
+      },
+      selectedCountry: ''
     };
   },
   components: {
@@ -100,6 +95,23 @@ export default {
     },
     showSubreddit(name) {
       this.subreddit = name;
+    },
+    onCountryChanged(country) {
+      this.selectedCountry = country;
+      this.updateGraph();
+    },
+    updateGraph() {
+      if (this.selectedCountry) {
+        this.graph.forEachNode(node => {
+          if (node.data.country !== this.selectedCountry) {
+            this.graph.removeNode(node.id);
+          }
+        });
+      }
+    },
+    onSelected(q) {
+      appState.query = q;
+      this.onSubmit();
     }
   },
   mounted() {

@@ -139,6 +139,8 @@ input::placeholder {
 </style>
 
 <script>
+import subredditCountries from '../lib/subredditCountries';
+
 export default {
   props: {
     readonly: {
@@ -166,7 +168,9 @@ export default {
       showLoading: false,
       loadingError: null,
       suggestions: [],
-      currentQuery: this.query
+      currentQuery: this.query,
+      selectedCountry: '',
+      countries: Array.from(new Set(Object.values(subredditCountries)))
     };
   },
   watch: {
@@ -294,6 +298,10 @@ export default {
 
       this.suggestions[currentSelected].selected = true;
       this.currentSelected = currentSelected;
+    },
+
+    onCountryChange() {
+      this.$emit('country-changed', this.selectedCountry);
     }
   }
 };
